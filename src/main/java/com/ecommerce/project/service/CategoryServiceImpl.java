@@ -1,5 +1,7 @@
 package com.ecommerce.project.service;
 
+import com.ecommerce.project.exceptions.APIException;
+import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.repository.CategoryRepository;
 import jakarta.annotation.PostConstruct;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -28,20 +31,24 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void createCategory(Category category) {
+        Optional<Category> existingCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+        if(existingCategory.isPresent()){
+            throw new APIException("Category with name " + category.getCategoryName() + " already exists");
+        }
         categoryRepository.save(category);
     }
 
     @Override
     public String deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+                new ResourceNotFoundException("Category", "categoryId", categoryId));
         categoryRepository.delete(category);
         return "Category with ID: " + categoryId + " removed successfully!!";
     }
 
     @Override
     public Category updateCategory(Category category, Long  categoryId) {
-        Category existingCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+        Category existingCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         existingCategory.setCategoryName(category.getCategoryName());
         existingCategory = categoryRepository.save(existingCategory);
         return existingCategory;
