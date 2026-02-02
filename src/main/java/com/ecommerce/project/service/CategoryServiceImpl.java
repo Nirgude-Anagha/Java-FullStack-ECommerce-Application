@@ -1,5 +1,7 @@
 package com.ecommerce.project.service;
 
+import com.ecommerce.project.dto.CategoryDTO;
+import com.ecommerce.project.dto.CategoryResponse;
 import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -17,12 +20,14 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public List<Category> getAllCategories() {
+    public CategoryResponse getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         if(categories.isEmpty()){
             throw new APIException("No category created yet!!!");
         }
-        return categoryRepository.findAll();
+        List<CategoryDTO> categoryDTOS = categories.stream().map(c -> new CategoryDTO(c.getCategoryId(), c.getCategoryName())).collect(Collectors.toList());
+
+        return new CategoryResponse(categoryDTOS);
     }
 
     @Override

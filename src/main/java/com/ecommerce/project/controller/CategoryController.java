@@ -1,5 +1,6 @@
 package com.ecommerce.project.controller;
 
+import com.ecommerce.project.dto.CategoryResponse;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.service.CategoryService;
 import jakarta.validation.Valid;
@@ -20,9 +21,9 @@ public class CategoryController {
     }
 
     @GetMapping(path = "/public/categories")
-    private ResponseEntity<List<Category>> getAllCategories(){
-        List<Category> allCategories = categoryService.getAllCategories();
-        return new ResponseEntity<>(allCategories, HttpStatus.OK);
+    private ResponseEntity<CategoryResponse> getAllCategories(){
+        CategoryResponse categories = categoryService.getAllCategories();
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @PostMapping(path = "/public/categories")
